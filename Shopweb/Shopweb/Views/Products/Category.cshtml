@@ -1,0 +1,12 @@
+﻿@model IEnumerable<Shopweb.Models.Category>
+<style>
+    a{
+        text-decoration: none;
+    
+    }
+</style>
+@foreach (var item in Model)
+{
+    <a href="/ProductByCategpory/@item.category_id">@item.name</a> 
+    <label> &nbsp;| &nbsp;</label>
+}

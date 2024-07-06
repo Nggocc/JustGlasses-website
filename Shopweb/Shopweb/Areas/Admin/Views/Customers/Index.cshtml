@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Shopweb.Models.Customer>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Khách Hàng</h2>
+
+<p>
+    @Html.ActionLink("Thêm mới khách hàng", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.phone)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.address)
+        </th>
+        
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.phone)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.address)
+        </td>
+        
+        <td>
+            @Html.ActionLink("Sửa", "Edit", new { id=item.customer_id }) |
+            @Html.ActionLink("Chi tiết", "Details", new { id=item.customer_id }) |
+            @Html.ActionLink("Xóa", "Delete", new { id=item.customer_id })
+        </td>
+    </tr>
+}
+
+</table>

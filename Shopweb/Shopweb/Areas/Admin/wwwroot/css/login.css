@@ -1,0 +1,31 @@
+﻿div.login {
+    width: 400px;
+    margin: auto;
+    min-height: 300px;
+    background-color: aquamarine;
+}
+
+.input {
+    width: 95%;
+    height: 37px;
+    border: 1px solid #b3b3b3;
+    outline: none;
+    padding-left: 15px;
+    border-radius: 10px;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+.readall {
+    transition: all .2s linear;
+    color: #fff !important;
+    background-color: #9b0e62;
+    font-size: 20px;
+    font-weight: 200;
+    display: inline-block;
+    padding: 8px 15px;
+    border-radius: 10px;
+    outline: none;
+    border: 0;
+    cursor: pointer;
+}

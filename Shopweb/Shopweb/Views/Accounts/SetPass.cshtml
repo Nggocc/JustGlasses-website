@@ -1,0 +1,75 @@
+﻿@model Shopweb.Models.Account
+@{
+    ViewBag.Title = "SetPass";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .inp {
+        width: 280px;
+        border: lightgray 1px solid;
+        height: 45px;
+        border-radius: 10px;
+    }
+    .btn {
+        background-color: cornflowerblue;
+        font-weight: bold;
+        color: white;
+        border-radius: 10px;
+        height: 45px;
+        width: 200px;
+        float: right
+    }
+    .btn:hover{
+        background-color: orangered;
+    }
+</style>
+<h2>
+
+    <label style="color: orangered; font-weight:bold; font-size:40px; margin-bottom: 5px">|</label>
+    Đổi mật khẩu
+
+</h2>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+
+}
+
+@using (Html.BeginForm("SetPass", "Accounts", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+
+    @Html.AntiForgeryToken()
+    <div style="margin-top: 20px">
+        <table style="width:650px" class="table">
+            <tr>
+                <td>Mật khẩu cũ</td>
+                <td>
+                    @Html.HiddenFor(model => model.loginName)
+                    <input type="text" name="oldpass" class="inp" />
+                </td>
+            </tr>
+
+            <tr>
+                <td>Mật khẩu mới</td>
+                <td>
+                    <input type="password" name="password" class="inp" />
+                </td>
+            </tr>
+            <tr>
+                <td>Xác nhận mật khẩu mới</td>
+                <td>
+                    <input type="password" name="confirmPw" class="inp" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="border: none">
+                    <input type="submit" value="Lưu thông tin" class="btn" role="button" />
+
+                </td>
+            </tr>
+        </table>
+    </div>
+}
+
+

@@ -1,0 +1,150 @@
+﻿@model IEnumerable<Shopweb.Models.Order>
+@using Shopweb.Models
+@{
+    ViewBag.Title = "MyPurchase";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    table a {
+        text-decoration: none;
+        color: darkblue;
+        font-size: 15px;
+    }
+
+        table a:hover {
+            color: orange;
+        }
+
+    .submit {
+        background-color: cornflowerblue;
+        color: white;
+        font-weight: bold;
+        width: 300px;
+        height: 45px;
+        margin-bottom: 15px;
+    }
+
+        .submit:hover {
+            background-color: orangered;
+            color: white;
+        }
+
+    .continue {
+        background-color: black;
+        color: white;
+        font-weight: bold;
+        height: 45px;
+        width: 280px
+    }
+
+        .continue:hover {
+            background-color: pink;
+            color: white;
+        }
+
+    .sortbtn {
+        color: black;
+        width: 200px;
+        text-align: center
+    }
+
+        .sortbtn:hover {
+            font-weight: bold;
+            color: cornflowerblue
+        }
+
+    .active {
+        font-weight: bold;
+        color: cornflowerblue
+    }
+</style>
+<h4>
+
+    <label style="color: orangered; font-weight:bold; font-size:35px;">|</label>
+    Đơn hàng đã đặt
+
+</h4>
+<div class="w-100 d-flex justify-content-between" style="background-color: #d5dbe9; color:gray; height: 50px;font-size: 15px; padding: 20px; margin-top: 20px">
+
+    <div>
+        <a href="@Url.Action("MyPurchase", "Orders", new { currentFilter = ViewBag.st1 })" class="sortbtn @(ViewBag.currentFilter == ViewBag.st1 ? "active" : "")">Chờ lấy hàng</a>
+
+    </div>
+    <div>
+        <a href="@Url.Action("MyPurchase", "Orders", new { currentFilter = ViewBag.st2 })" class="sortbtn @(ViewBag.currentFilter == ViewBag.st2 ? "active" : "")">Đang giao hàng</a>
+
+    </div>
+    <div>
+        <a href="@Url.Action("MyPurchase", "Orders", new { currentFilter = ViewBag.st3 })" class="sortbtn @(ViewBag.currentFilter == ViewBag.st3 ? "active" : "")">Đã giao</a>
+
+    </div>
+    <div>
+        <a href="@Url.Action("MyPurchase", "Orders", new { currentFilter = ViewBag.st4 })" class="sortbtn @(ViewBag.currentFilter == ViewBag.st4 ? "active" : "")">Đã hủy</a>
+
+    </div>
+</div>
+
+<div class="d-flex">
+    <table class="w-100 table" style="margin-top: 30px">
+        <tr>
+            <th style="padding:0px  20px">Sản phẩm</th>
+
+            <th>Số lượng</th>
+
+            <th>Thành tiền</th>
+            
+
+        </tr>
+        @foreach (var item in Model)
+        {
+
+            DBContext db = new DBContext();
+            var od = db.Order_Details.FirstOrDefault(o => o.order_id == item.order_id);
+            if (od != null)
+            {
+                var p = db.Products.FirstOrDefault(pd => pd.product_id == od.product_id);
+
+                decimal tt = od.quantity * p.price;
+                string ttFormatted = tt.ToString("#,##0") + " VND";
+                string path = "~/Content/Images/" + p.image;
+                <tr>
+                    <td>
+
+                        <div class="d-flex align-items-center">
+
+                            <img src="@Url.Content(path)" class="img-thumbnail" width="120" />
+
+
+                            <label>@p.name.ToUpper() </label>
+
+                        </div>
+
+                    </td>
+                    <td>
+
+                        <label style="margin-top: 50px">@od.quantity</label>
+
+                    </td>
+
+                    <td style="color: red ">
+                        <label style="margin-top: 50px">@ttFormatted</label>
+                    </td>
+                    <td>
+                        <a href="@Url.Action("Details", "Orders", new { id = item.order_id })"><i>More</i></a>
+                    </td>
+                </tr>
+
+            }
+
+
+
+
+        }
+    </table>
+
+</div>
+
+<a href="@Url.Action("AllProducts", "Products")" class="btn continue">Tiếp tục mua hàng</a>
+
+

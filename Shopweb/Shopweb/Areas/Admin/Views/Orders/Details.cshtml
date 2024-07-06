@@ -1,0 +1,87 @@
+﻿@model Shopweb.Models.Order
+@using Shopweb.Models
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<p>
+    @Html.ActionLink("Trở về", "Index")
+</p>
+<h2>Chi tiết</h2>
+@{
+    var db = new DBContext();
+    var proList = db.Order_Details.Where(o => o.order_id == Model.order_id).ToList();
+    decimal sum = 0;
+
+}
+<div>
+    @Html.ActionLink("Cập nhập trạng thái", "Edit", new { id = Model.order_id })
+    <hr />
+    <table class="table">
+        <tr>
+            <th>
+                Người đặt
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Shipment.address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Shipment.phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.status)
+            </th>
+            <th>@Html.DisplayNameFor(model => model.Payment.payMethod) </th>
+        </tr>
+
+
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => Model.Payment.Customer.name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => Model.Shipment.address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => Model.Shipment.phone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => Model.date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => Model.status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => Model.Payment.payMethod)
+            </td>
+        </tr>
+    </table>
+    <table class="table">
+        <tr>
+            <th>Mã SP</th>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+        </tr>
+
+        @foreach (var item in proList)
+        {
+            var tt = item.quantity * item.Product.price;
+            var ttformat = tt.ToString("##,##");
+            sum += tt;
+            <tr>
+                <td>@item.product_id</td>
+                <td>@item.Product.name</td>
+                <td>@item.quantity</td>
+                <td>@ttformat</td>
+            </tr>
+
+        }
+
+    </table>
+    <label style="float: right; margin-right: 80px; color: red">@sum.ToString("##,##") VND</label>
+</div>
+

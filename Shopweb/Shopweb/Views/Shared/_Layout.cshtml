@@ -1,0 +1,209 @@
+﻿@using Shopweb.Models
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ShobWeb Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style>
+        * {
+            font-family: Tahoma;
+            letter-spacing: 1px;
+        }
+
+        
+        /* Kiểu cho các mục dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-right: 30px
+        }
+
+        /* Kiểu cho menu dropdown */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 6px;
+        }
+
+            /* Kiểu cho các mục trong menu dropdown */
+            .dropdown-content a {
+                color: black;
+                margin: 0;
+                padding: 10px;
+                width: 185px;
+                text-decoration: none;
+                display: block;
+                text-align: left;
+               
+            }
+
+        /* Hiển thị menu dropdown khi di chuột vào */
+        .dropdown:hover .dropdown-content {
+            display: block;
+            margin-top: 40px;
+        }
+
+        /* Hiển thị submenu khi di chuột vào mục con */
+        .dropdown-submenu:hover .dropdown-content {
+            display: block;
+            left: 100%;
+            top: 0;
+        }
+
+        /* Đảm bảo submenu nằm ngang bên phải của mục chính */
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .navbar a {
+            color: darkblue;
+        }
+
+            .navbar a:hover, .dropdown:hover .dropbtn {
+                color: orange;
+            }
+
+        .dropdown-content a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            bottom: 0;
+            width: 100%;
+        }
+
+            footer p {
+                font-size: 15px;
+            }
+
+        .login a {
+            float: right;
+            margin-right: 20px;
+
+
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm ">
+        <div class="container">
+            <ul class="navbar-nav text-black w-100 d-flex justify-content-between align-items-center">
+                <li class="nav-item">
+                    <a href="@Url.Action("Index", "Products")">
+                        <img src="~/Content/Images/logo.png" width="200" style="margin-right: 10px;" />
+                    </a>
+                </li>
+
+                @*tìm kiếm*@
+                <li class="nav-item flex-grow-1 d-flex justify-content-center">
+                    @using (Html.BeginForm("Search", "Products", FormMethod.Post))
+                    {
+                        <div class="justify-content-xxl-center">
+                            <input type="text" name="key" style="width:600px; padding: 0 50px ;background-color: beige; border-radius: 10px; border-color: white; padding:3px 10px;" placeholder="Nhập từ khóa ...">
+                            <input type="submit" style="background-color: lightblue ; color: dimgray;  border-radius: 50px; width: 100px; height:35px; border-color: white" value="Tìm kiếm" />
+                        </div>
+                    }
+                </li>
+
+                @if (Session["account"] == null)
+                {
+                <li class="login fw-bold">@Html.ActionLink("Đăng nhập", "DangNhap", "Accounts", new { area = "" }, new { @class = "nav-link" })</li>
+
+                }
+                else
+                {
+                    DBContext db = new DBContext();
+                    Account acc = (Account)Session["account"];
+                    Customer customer = db.Customers.FirstOrDefault(c => c.customer_id == acc.customer_id);
+                <li class="nav-item login">
+                    <div class="dropdown">
+                        <a href="#" class="dropbtn nav-link" style="color: orange;font-weight: bold; padding-right: 40px">@acc.loginName</a>
+                        <div class="dropdown-content">
+                            <a href="@Url.Action("DangXuat", "Accounts")">Đăng xuất</a>
+                            <a href="@Url.Action("TaiKhoanCuaToi", "Accounts")">Tài khoản của tôi</a>
+                            <a href="@Url.Action("MyPurchase", "Orders")">Đơn hàng đã đặt</a>
+                            <a href="@Url.Action("getWistList", "Products")">Sản phẩm yêu thích</a>
+                        </div>
+                    </div>
+                </li>
+                }
+
+
+            </ul>
+        </div>
+    </nav>
+
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm ">
+        <div class="container">
+            <ul class="navbar-nav d-flex justify-content-center w-100 fw-bold text-black">
+
+                @{ Html.RenderAction("Category", "Products");}
+                @Html.ActionLink("About us", "About", "Home") &nbsp;|&nbsp; 
+                @Html.ActionLink( "Giỏ hàng","XemGioHang", "Carts")
+            </ul>
+        </div>
+    </nav>
+    <div class="container body-content" style="padding: 2px">
+        @RenderBody()
+        <hr />
+
+    </div>
+    <footer class="justify-content-center mt-5" style="background-color: #E0E5F2; padding: 20px 0 0 0; margin-bottom:-17px">
+        <div class="container">
+            <div class="row d-flex ">
+                <div class="col-md-4">
+
+                    <a href="@Url.Action("Index", "Products")">
+                        <img src="~/Content/Images/logo.png" width="200" />
+                    </a>
+
+                    <div style="margin-left:20px; margin-top: 15px">
+                        <h6>Bản đồ chỉ dẫn</h6>
+                        <p>Tiệm mắt kính JUST GLASSES</p>
+                        <p>
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4104.211596772135!2d105.73267887888986!3d21.05365624180455!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31345457e292d5bf%3A0x20ac91c94d74439a!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBDw7RuZyBuZ2hp4buHcCBIw6AgTuG7mWk!5e0!3m2!1svi!2s!4v1716090121600!5m2!1svi!2s"
+                                    width="290" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <h6>Trụ sở chính</h6>
+                    <p>Nhà A11 - Khu A, Phường Minh Khai, Quận Bắc Từ Liêm, Hà Nội</p>
+                    <h6>Các cơ sở khác</h6>
+                    <p>
+                        Cơ sở 2: Tầng 1,2 Nhà B8 - Khu B, Phường Tây Tựu, Quận Bắc Từ Liêm, Hà Nội<br />
+                        Cơ sở 3: Tầng 3 Nhà C18 - Khu C, Phường Lê Hồng Phong, Thành phố Phủ Lý, tỉnh Hà Nam
+                    </p>
+                </div>
+                <div class="col-md-4 footer-site">
+                    <h6>Liên kết site</h6>
+                    <ul>
+                        <li><a href="https://www.haui.edu.vn/vn" class="nav-link">Trường Đại học Công Nghiệp Hà Nội</a></li>
+                        <li><a href="#" class="nav-link">Quy định</a></li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                Facebook
+                            </a>
+                        </li>
+                        <li><a href="#">Giới thiệu</a></li>
+                        <li><a href="#">Hướng dẫn mua hàng</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div style="text-align:center;">
+            <p style="font-size:12px"><i>&copy; @DateTime.Now.Year - My SHOPInWEb Application</i></p>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,212 @@
+﻿@using Shopweb.Models;
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    DBContext db = new DBContext();
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Thống kê</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-comments fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            @{
+                                var tongkh = db.Customers.Count();
+
+                            }
+                            <div class="huge" style="font-size:20px;">@tongkh</div>
+                            <div>Tổng khách hàng</div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-green">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-tasks fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            @{
+                                var tongDH = db.Order_Details.Count();
+                            }
+                            <div class="huge" style="font-size:20px;">@tongDH</div>
+                            <div>Tổng đơn hàng</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-yellow">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-shopping-cart fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            @{
+                                var tongSP = db.Products.Count();
+                            }
+                            <div class="huge" style="font-size:20px;">@tongSP</div>
+                            <div>Tổng sản phẩm</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-red">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-support fa-5x"></i>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            @{
+                                double tongDT = 0;
+                                foreach (var item in db.Order_Details)
+                                {
+                                    var gia = db.Products
+                                    .Where(p => p.product_id == item.product_id)
+                                    .Select(p => p.price)
+                                    .FirstOrDefault();
+                                    double giasp = Convert.ToDouble(gia);
+                                    tongDT += item.quantity * giasp;
+                                }
+                            }
+                            <div class="huge" style="font-size:20px;">@tongDT</div>
+                            <div>Tổng doanh thu</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-8" style="width:900px;">
+            <div class="panel panel-default" style="width:900px;">
+
+                <!-- /.panel-heading -->
+                <div class="panel-body" style="width:900px;">
+                    <div id="morris-area-chart" style="width:900px;"></div>
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+            <div class="panel panel-default" style="width:900px;">
+                <div class="panel-heading" style="width:900px;">
+                    <i class="fa fa-bar-chart-o fa-fw" style="width:975px;"></i> Thống kê chi tiết các đơn hàng &nbsp;|&nbsp; @Html.ActionLink("Xuất ra Excel", "ExportToExcel", "Home")
+                </div>
+                <form method="get" action="" style="margin-left: 15px">
+                    <label for="month">Nhập tháng (MM):</label>
+                    <input type="text" id="month" name="month" required pattern="\d{2}" title="Nhập tháng theo dạng MM">
+                    <button type="submit">Xuất</button>
+                </form>
+
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <div class="row" style="width:850px;">
+                        <div class="col-lg-4" style="width:850px;">
+                            <div class="table-responsive" style="width:850px;">
+                                <table style="width:850px;max-width:inherit" class="table table-bordered table-hover table-striped">
+                                    <thead>
+                                        <tr>
+
+                                            <th>Số lượng</th>
+                                            <th>Mã sản phẩm</th>
+                                            <th>Tên sản phẩm</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Tổng tiền</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var monthStr = Request.QueryString["month"];
+                                            int month;
+                                            bool ktraMonth = int.TryParse(monthStr, out month) && month >= 1 && month <= 12;
+                                            var orderDetailsQ = db.Order_Details.AsQueryable();
+
+                                            if (ktraMonth)
+                                            {
+                                                orderDetailsQ = orderDetailsQ.Where(od => db.Orders.FirstOrDefault(o => o.order_id == od.order_id).date.Month == month);
+                                            }
+
+                                            var orderDetails = orderDetailsQ
+                                                .OrderByDescending(od => db.Orders.FirstOrDefault(o => o.order_id == od.order_id).date)
+                                                .ToList();
+
+
+                                            foreach (var item in orderDetails)
+                                            {
+                                                var orderDetail = item;
+                                                var product = db.Products.FirstOrDefault(p => p.product_id == orderDetail.product_id); // Lấy thông tin  Products
+                                                var order = db.Orders.FirstOrDefault(o => o.order_id == orderDetail.order_id); // Lấy thông tin Orders
+
+                                                var gia = db.Products
+                                                    .Where(p => p.product_id == item.product_id).Select(p => p.price)
+                                                    .FirstOrDefault();
+                                                double giasp = Convert.ToDouble(gia);
+                                                double giaDh = item.quantity * giasp;
+
+
+                                                <tr>
+
+                                                    <td>@orderDetail.quantity</td>
+                                                    <td>@orderDetail.product_id</td>
+                                                    <td>@product.name</td>
+                                                    <td>@order.date.ToString("yyyy-MM-dd")</td>
+                                                    <td>@giaDh</td>
+
+                                                </tr>
+
+                                            }
+                                        }
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- /.table-responsive -->
+                        </div>
+                        <!-- /.col-lg-4 (nested) -->
+                        <div class="col-lg-8">
+                            <div id="morris-bar-chart"></div>
+                        </div>
+                        <!-- /.col-lg-8 (nested) -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
+        <!-- /.panel -->
+    </div>
+    <!-- /.col-lg-8 -->
+    <!-- /.col-lg-4 -->
+</div>
+<!-- /.row -->

@@ -1,0 +1,179 @@
+﻿@model IEnumerable<Shopweb.Models.Cart_Details>
+@using Shopweb.Models
+@{
+    ViewBag.Title = "Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .submit {
+        background-color: cornflowerblue;
+        color: white;
+        font-weight: bold;
+        width: 300px;
+        height: 45px;
+        margin-bottom: 15px;
+    }
+
+        .submit:hover {
+            background-color: orangered;
+            color: white;
+        }
+
+    .input {
+        width: 100vh;
+        height: 32px;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .form-label, th {
+        font-size: 14px;
+    }
+</style>
+@{
+    DBContext db = new DBContext();
+    int sl = 0;
+    decimal thanhtien = 0;
+    if (Model != null && Model.Any())
+    {
+        sl = Convert.ToInt16(Model.Sum(ct => ct.quanlity));
+        thanhtien = Convert.ToDecimal(Model.Sum(x => x.quanlity * db.Products.FirstOrDefault(p => p.product_id == x.product_id).price));
+    }
+    string thanhtienFormatted = thanhtien.ToString("#,##0") + " VND";
+}
+<div class="w-100 d-flex align-items-center" style="background-color: #d5dbe9; color:gray; height: 50px;font-size: 13px">
+    <span style="margin-left: 15px">Home > Checkout</span>
+</div>
+@if (ViewBag.Error != null)
+{
+    <label class="alert alert-danger w-100">@ViewBag.Error</label>
+}
+@{
+    var shipment = ViewBag.shipment as Shipment;
+    var acc = (Account)Session["account"];
+}
+
+@using (Html.BeginForm("Order", "Carts", FormMethod.Post, new { id = shipment.shipment_id }))
+{
+    @Html.Hidden("id", shipment.shipment_id) <!-- Hidden field to ensure id is passed -->
+    <div class="d-flex justify-content-between">
+        <div style="width: 35%">
+            <h4 style="margin-top: 20px">Thông tin thanh toán</h4>
+            <br />
+            <table>
+                <tr>
+                    <td>
+                        <label class="form-label">Người nhận</label>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="receiverName" class="input form-control" value="@shipment.receiverName" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">
+                        <label>SĐT</label>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="phone" class="input form-control" value="@shipment.phone" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">
+                        <label>Thành phố</label>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="city" class="input form-control" value="@shipment.city" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="form-label">
+                        <label>Địa chỉ cụ thể</label>
+                    </td>
+                    
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="address" class="input form-control" value="@shipment.address" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="width: 65%">
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="d-flex">
+                    <table class="w-100 table" style="margin-top: 80px">
+                        <tr>
+                            <th style="padding:0px  20px">Sản phẩm</th>
+
+                            <th>Giá</th>
+
+                            <th>Tạm tính</th>
+
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            Product p = db.Products.FirstOrDefault(sa => sa.product_id == item.product_id);
+                            <tr>
+                                <td>
+                                    @{
+                                        string path = "~/Content/Images/" + p.image;
+                                    }
+                                    <div class="d-flex align-items-center">
+
+                                        <img src=@Url.Content(path) class="img-thumbnail" width="120" />
+
+
+                                        <label>@p.name.ToUpper() <br /> <b> x @item.quanlity</b></label>
+
+                                    </div>
+
+                                </td>
+                                <td>
+
+                                    @{
+                                        decimal giatien = (decimal)p.price;
+                                        string giaTienFormatted = giatien.ToString("#,##0") + " VND";
+                                        decimal tt = item.quanlity * p.price;
+                                        string ttFormatted = tt.ToString("#,##0") + " VND";
+                                    }
+                                    <label style="margin-top: 64px">@giaTienFormatted</label>
+
+                                </td>
+
+                                <td style="color: red; text-align: center; ">
+                                    <label style="margin-top: 64px">@ttFormatted</label>
+                                </td>
+
+                            </tr>
+                        }
+                    </table>
+
+                </div>
+                <div class="d-flex justify-content-end" style=" margin-top: 30px">
+                    <div>
+                        <p>
+                            <b>Thành tiền:</b>
+                            <span style="color: red">@thanhtienFormatted</span>
+                        </p>
+                        <input type="submit" value="ĐẶT HÀNG" class="btn submit" />
+
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+}
+

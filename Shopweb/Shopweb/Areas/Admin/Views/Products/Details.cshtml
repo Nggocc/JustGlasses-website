@@ -1,0 +1,147 @@
+﻿@model Shopweb.Models.Product
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var gallery = Model.gallery.Split(',');
+}
+
+<h2>Chi tiết</h2>
+
+<div>
+    <h4>Sản phẩm</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Category.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Category.name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SKU)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SKU)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.price)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.stock)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.stock)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.material)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.material)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.gender)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.gender)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.shape)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.shape)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.color)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.color)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.image)
+        </dt>
+
+        <dd>
+            <img src="~/Content/Images/@Model.image" class="img-thumbnail" width="150" />
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.gallery)
+        </dt>
+        @foreach (var item in gallery)
+        {
+            <img src="~/Content/Images/@item" class="img-thumbnail" width="150" />
+        }
+
+        <dt>
+            @Html.DisplayNameFor(model => model.eye_width)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.eye_width)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.eye_lenth)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.eye_lenth)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.InventoryDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.InventoryDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.entryPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.entryPrice)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Sửa", "Edit", new { id = Model.product_id }) |
+    @Html.ActionLink("Trở về", "Index")
+</p>

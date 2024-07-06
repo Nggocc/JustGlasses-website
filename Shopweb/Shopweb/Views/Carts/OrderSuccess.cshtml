@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewBag.Title = "OrderSuccess";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .continue {
+        background-color: black;
+        color: white;
+        font-weight: bold;
+        height: 45px;
+        width: 280px
+    }
+
+        .continue:hover {
+            background-color: pink;
+            color: white;
+        }
+</style>
+<div class="d-flex justify-content-center" style="margin-top: 50px">
+    <div style="text-align: center;">
+        <p>Cảm ơn bạn. Đơn hàng đã được đặt</p>
+
+        <p>Vui lòng kiểm tra đơn đặt hàng để chúng tôi có thể giao hàng đến bạn !</p>
+        <br />
+        <a href="@Url.Action("AllProducts", "Products")" class="btn continue">Tiếp tục mua hàng</a>
+    </div>
+    
+</div>

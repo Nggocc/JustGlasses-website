@@ -1,0 +1,227 @@
+﻿@model PagedList.IPagedList<Shopweb.Models.Product>
+@using PagedList.Mvc
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@{
+    ViewBag.Title = "ProductByCategory";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .product-card {
+        border: 1px solid lightgrey;
+        text-align: center;
+        width: 270px;
+        padding: 10px; /* Padding inside the card */
+        box-sizing: border-box; /* Ensure padding is included in the width and height */
+    }
+
+        .product-card img {
+            width: 100%;
+            height: 250px;
+            margin-bottom: 10px; /* Space between image and next element */
+        }
+
+        .product-card a {
+            text-align: center;
+            display: block;
+            margin-bottom: 10px; /* Space between links and other elements */
+            color: inherit; /* Keep link color consistent */
+            text-decoration: none; /* Remove underline from links */
+        }
+
+        .product-card p {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+    .dropdown select {
+        font-size: 14px;
+        width: 220px;
+        height: 40px;
+        float: left;
+        border: 1px solid lightgray;
+        color: gray;
+        margin-bottom: 20px
+    }
+
+    h4 {
+        color: #4872FA;
+        font-weight: 600;
+    }
+
+    .widget {
+        width: 300px;
+        padding-left: 25px;
+        border-radius: 8px;
+        border: 4px solid #ECF0FE;
+        height: 890px;
+        overflow-y: auto;
+    }
+
+        .widget a {
+            margin-left: 10px;
+            font-size: 15px;
+            color: black
+        }
+
+    .submit {
+        background-color: cornflowerblue;
+        color: white;
+        font-weight: bold;
+        width: 50px;
+        height: 40px;
+        border-radius: 5px;
+        border: none
+    }
+
+        .submit:hover {
+            background-color: orangered;
+            color: white;
+        }
+
+    input {
+        margin-right: 15px
+    }
+</style>
+<div class="container body-content d-flex" style="padding: 2px">
+    @using (Html.BeginForm("ProductByCategory", "Products", FormMethod.Get, new { @class = "filter-form" }))
+    {
+        <div class="widget">
+            <div>
+                <p>
+                    <h4>GIỚI TÍNH</h4>
+                    <br />
+                <p>
+                    <input type="checkbox" name="filter" value="Nữ" />Nữ
+
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Nam" />Nam
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Unisex" />Unisex
+                </p>
+            </div>
+            <div>
+                <p>
+                    <h4>KIỂU DÁNG</h4>
+                    <br />
+                <p>
+                    <input type="checkbox" name="filter" value="Hình chữ nhật" />Hình chữ nhật
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Đa giác" />Đa giác
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Oval" />Oval
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Mắt mèo" />Mắt mèo
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Tròn" />Tròn
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Vuông" />Vuông
+                </p>
+            </div>
+            <div>
+                <p>
+                    <h4>CHẤT LIỆU</h4>
+                    <br />
+                <p>
+                    <input type="checkbox" name="filter" value="Nhựa" />Nhựa
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Thép" />Thép
+                </p>
+                <p>
+                    <input type="checkbox" name="filter" value="Titan" />Titan
+                </p>
+            </div>
+            <div>
+                <p>
+                    <h4>GIÁ</h4>
+
+                </p>
+                <p>
+                    <input type="range" id="priceRange" class="form-range" style="width: 220px" name="priceRange" min="50000" max="6000000" step="20000" oninput="updatePrice(this.value)" />
+                    <label for="priceRange">Giá: <span id="priceValue">0 - 6.000.000 VND</span></label>
+                </p>
+                <p>
+                    <input type="submit" value="LỌC" class="submit" />
+                </p>
+            </div>
+        </div>
+    }
+    <div style="margin-left: 30px; width: 900px">
+         
+        <div>
+            <div class="dropdown">
+                <select name="sortOrder" onchange="handleChange(this.value)">
+                    <option value="inventory" @(ViewBag.SortOrder == "inventory" ? "selected" : "")>Sort by Date</option>
+                    <option value="name" @(ViewBag.SortOrder == "name" ? "selected" : "")>Sort by Name</option>
+                    <option value="price" @(ViewBag.SortOrder == "price" ? "selected" : "")>Sort by Price</option>
+                </select>
+            </div>
+            <div class="row w-100">
+                @foreach (var item in Model)
+                {
+
+                    <div class="col-sm-6 col-md-4 col-lg-4 mb-4 d-flex justify-content-start">
+                        <div class="product-card">
+                            @{
+                                string path = Url.Content("~/Content/Images/" + item.image);
+                                string name = item.name?.ToUpper();
+                                decimal giatien = (decimal)item.price;
+                                string giaTienFormatted = giatien.ToString("#,##0") + " VND";
+                            }
+
+                            <a href="@Url.Action("Details", "Products", new { id = item.product_id })">
+                                <img src="@path" alt="Product Image" />
+                            </a>
+
+                            <a href="@Url.Action("Details", "Products", new { id = item.product_id })" class="product-name-link">
+                                @name
+                            </a>
+
+                            <p class="price" style="color: orange;"><b>@giaTienFormatted</b></p>
+                        </div>
+                    </div>
+
+                }
+            </div>
+            <div>
+                @Html.PagedListPager(Model, page => Url.Action("ProductByCategory", new
+           {
+               page,
+               sortOrder = ViewBag.CurrentSort,
+               currentFilter = ViewBag.CurrentFilter
+           }))
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function updatePrice(value) {
+        // Format the value as currency
+        let formattedValue = parseInt(value).toLocaleString('vi-VN') + " VND";
+        document.getElementById('priceValue').textContent = formattedValue;
+    }
+
+   function handleChange(value) {
+        var url = '@Url.Action("ProductByCategory", new { category_id = ViewBag.category_id })';
+        var filterParams = Array.from(document.querySelectorAll("input[name='filter']:checked")).map(cb => cb.value).join("&filter=");
+        var priceRange = document.getElementById('priceRange').value;
+        var sortOrder = value; // Get the new sortOrder from the selected option
+        var currentPage = '@Model.PageNumber'; // Get the current page number from Model
+
+        var newUrl = url + '?sortOrder=' + sortOrder + '&filter=' + filterParams + '&priceRange=' + priceRange + '&page=' + currentPage;
+
+        window.location.href = newUrl; // Redirect to the new URL
+}
+</script>
+
+

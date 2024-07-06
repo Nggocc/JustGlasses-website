@@ -1,0 +1,125 @@
+﻿@model IEnumerable<Shopweb.Models.WishList>
+@using Shopweb.Models
+@{
+    ViewBag.Title = "Wishlist";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .product-card {
+        border: 1px solid lightgrey;
+        text-align: center;
+        width: 270px;
+        padding: 10px; /* Padding inside the card */
+        box-sizing: border-box; /* Ensure padding is included in the width and height */
+    }
+
+        .product-card img {
+            width: 100%;
+            height: 270px;
+            margin-bottom: 10px; /* Space between image and next element */
+        }
+
+        .product-card a {
+            text-align: center;
+            display: block;
+            margin-bottom: 10px; /* Space between links and other elements */
+            color: inherit; /* Keep link color consistent */
+            text-decoration: none; /* Remove underline from links */
+        }
+
+        .product-card p {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+    .dropdown select {
+        font-size: 14px;
+        width: 220px;
+        height: 40px;
+        float: left;
+        border: 1px solid lightgray;
+        color: gray;
+        margin-bottom: 20px
+    }
+
+    .continue {
+        background-color: black;
+        color: white;
+        font-weight: bold;
+        height: 45px;
+        width: 280px;
+    }
+
+        .continue:hover {
+            background-color: pink;
+            color: white;
+        }
+</style>
+<div class="container">
+    @if (Model != null && Model.Any())
+    {
+        <div class="w-100 d-flex align-items-center" style="background-color: #d5dbe9; color:gray; height: 50px;font-size: 13px; margin-bottom: 25px">
+            <span style="margin-left: 15px">Home <span style="margin-bottom: 5px; font-size: 11px">></span> Sản phẩm yêu thích</span>
+        </div>
+        <div class="dropdown">
+            <select name="sortOrder" onchange="handleChange(this.value)">
+                <option value="date" @(ViewBag.SortOrder == "date" ? "selected" : "")>Sort by Date</option>
+                <option value="name" @(ViewBag.SortOrder == "name" ? "selected" : "")>Sort by Name</option>
+                <option value="price" @(ViewBag.SortOrder == "price" ? "selected" : "")>Sort by Price</option>
+            </select>
+        </div>
+
+        DBContext db = new DBContext();
+        <div class="row">
+            @foreach (var item in Model)
+            {
+
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-3 d-flex justify-content-start">
+                    <div class="product-card">
+                        @{
+                            Product p = db.Products.FirstOrDefault(pd => pd.product_id == item.product_id);
+                            string path = Url.Content("~/Content/Images/" + p.image);
+                            string name = p.name?.ToUpper();
+                            decimal giatien = (decimal)p.price;
+                            string giaTienFormatted = giatien.ToString("#,##0") + " VND";
+                        }
+
+                        <a href="@Url.Action("Details", "Products", new { id = item.product_id })">
+                            <img src="@path" alt="Product Image" />
+                        </a>
+
+                        <a href="@Url.Action("Details", "Products", new { id = item.product_id })" class="product-name-link">
+                            @name
+                        </a>
+
+                        <p class="price" style="color: orange;"><b>@giaTienFormatted</b></p>
+                    </div>
+                </div>
+
+            }
+
+
+
+        </div>
+    }
+    else
+    {
+        <div style="margin-top: 50px;">
+            <div>
+                <p style="font-weight: 600; text-align: center; font-size: 20px; margin-bottom: 50px; color: dimgrey" class="w-100"> Tiếp tục trải nghiệm mua hàng bạn nhé !</p>
+                <a href="@Url.Action("AllProducts", "Products")" class="btn continue">Tiếp tục mua hàng</a>
+
+            </div>            
+          
+        </div>
+    }
+</div>
+<script>
+    function handleChange(value) {
+    var url = '@Url.Action("getWistList")';
+
+    window.location.href = url + '?sortOrder=' + value;
+}
+</script>

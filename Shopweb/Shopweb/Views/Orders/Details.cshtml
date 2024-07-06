@@ -1,0 +1,152 @@
+﻿@model Shopweb.Models.Order
+@using Shopweb.Models
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .continue {
+        background-color: black;
+        color: white;
+        font-weight: bold;
+        height: 45px;
+        width: 280px
+    }
+
+        .continue:hover {
+            background-color: pink;
+            color: white;
+        }
+
+    .cancel {
+        width: 150px;
+        background-color: cornflowerblue;
+        border: none;
+        height: 40px;
+        font-weight: bold;
+        border-radius: 5px;
+        color: white;
+        float: right;
+        margin-right: 50px
+    }
+
+        .cancel:hover {
+            background-color: #fd6e1d;
+        }
+</style>
+@if (Model.status == "Đã giao")
+{
+    <div class="w-100 d-flex align-items-center" style="background-color: forestgreen; color:green; height: 50px;font-size: 18px">
+        <span style="margin-left: 15px">Đơn hàng đã hoàn thành</span>
+    </div>
+}
+else
+{
+    <div class="w-100 alert alert-danger">
+        <span style="margin-left: 15px">@Model.status</span>
+    </div>
+}
+@{
+    DBContext db = new DBContext();
+    var acc = (Account)Session["account"];
+    var shipment = db.Shipments.FirstOrDefault(s => s.customer_id == acc.customer_id && s.shipment_id == Model.shipment_id);
+    var orderDetails = db.Order_Details.Where(od => od.order_id == Model.order_id).ToList();
+}
+<div style="margin-left: 15px">
+    <h5 style="font-weight: 600">Địa chỉ nhận hàng</h5>
+    <p>
+        @shipment.receiverName<br />
+        SĐT: @shipment.phone<br />
+        @shipment.city/ @shipment.address
+    </p>
+</div>
+
+
+<div class="d-flex">
+    <table class="w-100 table" style="margin-top: 30px">
+        <tr>
+            <th style="padding:0px  20px">Sản phẩm</th>
+
+            <th>Số lượng</th>
+            <th>Giá tiền</th>
+
+            <th>Thành tiền</th>
+            <th></th>
+
+        </tr>
+        @foreach (var item in orderDetails)
+        {
+            var p = db.Products.FirstOrDefault(pd => pd.product_id == item.product_id);
+
+            <tr>
+                @{
+                    decimal giatien = (decimal)p.price;
+                    string giaTienFormatted = giatien.ToString("#,##0") + " VND";
+                    decimal tt = item.quantity * p.price;
+                    string ttFormatted = tt.ToString("#,##0") + " VND";
+                    string path = "~/Content/Images/" + p.image;
+
+                }
+                <td>
+
+                    <div class="d-flex align-items-center">
+
+                        <img src=@Url.Content(path) class="img-thumbnail" width="120" />
+
+
+                        <label>@p.name.ToUpper() </label>
+
+                    </div>
+
+                </td>
+                <td>
+
+                    <label style="margin-top: 50px">@item.quantity</label>
+
+                </td>
+                <td>
+                    <label style="margin-top: 50px">@p.price</label>
+                </td>
+                <td style="color: red ">
+                    <label style="margin-top: 50px">@ttFormatted</label>
+                </td>
+
+            </tr>
+        }
+    </table>
+
+</div>
+<br />
+<div class="d-flex justify-content-between">
+    <p>
+        <label style="font-weight: bold">Phương thức thanh toán: </label>
+        Thanh toán khi nhận hàng
+    </p>
+    <div>
+        <table width="450px">
+            <tr>
+                <td>Mã đơn hàng: </td>
+                <td>@Model.order_id</td>
+            </tr>
+            <tr>
+                <td>Thời gian đặt hàng:</td>
+                <td>@Model.date</td>
+            </tr>
+            <tr>
+                <td>Thời gian giao hàng:</td>
+                <td>@Model.Payment.date</td>
+            </tr>
+
+        </table>
+        <br />
+        @if (Model.status == "Đơn hàng đang được chuẩn bị")
+        {
+            <a href="@Url.Action("Cancel", "Orders", new {id= Model.order_id})" class="btn cancel">Hủy bỏ</a>
+        }
+    </div>
+</div>
+
+<a href="@Url.Action("AllProducts", "Products")" class="btn continue">Tiếp tục mua hàng</a>
+
+
+

@@ -1,0 +1,255 @@
+﻿@model Shopweb.Models.Product
+@using Shopweb.Models
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .main-image {
+        width: 100%
+    }
+
+    .add {
+        width: 100%;
+        background-color: cornflowerblue;
+        border: none;
+        height: 40px;
+        font-weight: bold;
+        border-radius: 5px;
+        color: white;
+    }
+
+        .add:hover {
+            background-color: #fd6e1d;
+        }
+
+    .order {
+        margin-top: 15px;
+        width: 80%;
+        background-color: #fd6e1d;
+        color: white;
+        border-radius: 5px;
+        border: none;
+        height: 40px;
+        font-weight: bold;
+    }
+
+        .order:hover {
+            background-color: cornflowerblue;
+        }
+
+    product-card {
+        border: 1px solid lightgrey;
+        text-align: center;
+        width: 270px;
+        height: auto;
+        padding: 10px;
+        box-sizing: border-box; /* Ensure padding is included in the width and height */
+    }
+
+    .product-card img {
+        width: 100%;
+        height: 270px;
+        margin-bottom: 10px; /* Space between image and next element */
+    }
+
+    .product-card a {
+        text-align: center;
+        display: block;
+        margin-bottom: 10px; /* Space between links and other elements */
+        color: inherit; /* Keep link color consistent */
+        text-decoration: none; /* Remove underline from links */
+    }
+
+    .product-card p {
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+</style>
+<div class="w-100 d-flex align-items-center" style="background-color: #d5dbe9; color:gray; height: 50px;font-size: 13px">
+    <span style="margin-left: 15px">@Model.Category.name <span style="margin-bottom: 9px; font-size: 11px">></span> @Model.name.Normalize()</span>
+</div>
+@{
+    var gallery = Model.gallery.Split(',');
+    decimal giatien = (decimal)Model.price;
+    string giaTienFormatted = giatien.ToString("#,##0") + " VND";
+}
+@using (Html.BeginForm("AddToCart", "Carts", new { id = Model.product_id }))
+{
+    <div class="container mt-4">
+        <div class="row d-flex">
+            <div style="width: 60%">
+
+                <div>
+                    <div class="main-image mb-4">
+                        <img id="mainImage" src="@Url.Content("~/Content/Images/" + Model.image)" class="img-fluid" alt="Main Product Image">
+                    </div>
+                    <div class="gallery">
+                        <div class="row">
+                            @foreach (var image in gallery)
+                            {
+                                <div class="col-3 gallery-thumbnail">
+                                    <img src="@Url.Content("~/Content/Images/" + image.Trim())" class="img-thumbnail" alt="Product Image" onclick="changeMainImage('@Url.Content("~/Content/Images/" + image.Trim())')">
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div style="width: 40%">
+                <p style="font-weight: bold; font-size: 18px">@Model.name.ToUpper()</p>
+                <p style="text-align: justify">@Model.description</p>
+                @if (Model.stock > 0)
+                {
+                    <p>Tình trạng: <b>Còn hàng</b></p>
+                }
+                else
+                {
+                    <p>Tình trạng: <b>Hết hàng</b></p>
+                }
+                <p>
+                    Giá: <span style="color: orangered; font-weight: bold; margin-right: 20px">@giaTienFormatted</span>
+                    @{
+                        DBContext db = new DBContext();
+                        Account acc = (Account)Session["account"];
+
+
+                    }
+                    @if (acc == null)
+                    {
+                    
+                    <a href="@Url.Action("DangNhap", "Accounts")">
+                        <img src="@Url.Content("~/Content/Images/heart-icon-black.jpg")" style="width: 40px; margin-bottom: 10px"/>
+                    </a>
+                }
+                else
+                {
+                    var wish = db.WishLists.FirstOrDefault(s => s.product_id == Model.product_id && s.wishList_id == acc.customer_id);
+                    if (wish == null)
+                    {
+                        <a href="@Url.Action("WishList", "Products", new{id= Model.product_id })" style="margin-left: 25px;">
+                            <img src="@Url.Content("~/Content/Images/heart-icon-black.jpg")" style="width: 40px; margin-bottom: 15px" id="wishimg" onclick="changeWishImage('@Url.Content("~/Content/Images/heart-icon-red.jpg")')" />
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("WishList", "Products", new{id= Model.product_id })" style="margin-left: 25px;">
+                            <img src="@Url.Content("~/Content/Images/heart-icon-red.jpg")" style="width: 40px; margin-bottom: 10px" id="wishimg" onclick="changeWishImage('@Url.Content("~/Content/Images/heart-icon-black.jpg")')" />
+                        </a>
+                    }
+                }
+
+
+                    </p>
+
+                    <input type="number" min="1" name="quantity" id="quantity" style="width: 60px; height: 40px; text-align: center" value="1">
+                    <input type="submit" value="THÊM VÀO GIỎ HÀNG" class="add" />
+
+                    <br />
+                    <a href="@Url.Action("Purchase", "Carts", new {id= Model.product_id, quantity= 1})" class="order btn">MUA NGAY</a>
+                    <br />
+                    <p style="margin-top: 15px">
+                        <b>MIỄN PHÍ GIAO HÀNG TOÀN QUỐC</b>
+                        <br />
+                        Với tất cả các đơn hàng có giá trị trên 400,000đ
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    }
+<div class="d-flex align-items-center justify-content-between" style="border-radius: 8px; background-color: whitesmoke; width: 60%; height: 100px; margin-top: 25px; padding: 0 35px">
+    <p>
+        <b>Chất liệu</b>
+        <br />
+        <label>@Model.material</label>
+    </p>
+    <p>
+        <b>Giới tính</b>
+        <br />
+        <label>@Model.gender</label>
+    </p>
+    <p>
+        <b>Kiểu dáng</b>
+        <br />
+        <label>@Model.shape</label>
+    </p>
+    <p>
+        <b>Màu</b>
+        <br />
+        <label>@Model.color</label>
+    </p>
+</div>
+<div style="margin-top: 25px">
+    <h1>ĐẶC ĐIỂM NỔI BẬT</h1>
+    <p style="margin-top: 20px">- Mắt kính rộng: @Model.eye_width mm</p>
+    <p style="margin-top: 20px">- Chiều dài gọng: @Model.eye_width mm</p>
+    <p style="margin-top: 20px; text-align:justify">@Model.description</p>
+    @{
+        var img = "~/Content/Images/" + Model.image;
+    }
+    <div style="text-align: center; ">
+        <img src="@Url.Content(img)" style="width: 75%" />
+    </div>
+</div>
+<div style="margin-top: 25px; text-align: justify">
+    <p>
+        Mọi thông tin chi tiết cần tư vấn về sản phẩm gọng kính cũng như các dịch vụ khác của kính mắt uy tín ở Hà Nội JUST GLASSES,
+        quý khách vui lòng liên hệ qua hotline: 0904915377 hoặc đến trực tiếp các cơ sở để có trải nghiệm về sản phẩm chân thực nhất.
+    </p>
+</div>
+<h1>SẢN PHẨM LIÊN QUAN</h1>
+
+<div class="container">
+    <div class="row d-flex justify-content-between">
+        @foreach (var item in ViewBag.relatedProducts)
+        {
+
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-3 mx-md-auto">
+                <div class="product-card">
+                    @{
+                        string path = Url.Content("~/Content/Images/" + item.image);
+                        string name = item.name?.ToUpper();
+                        decimal giatientt = (decimal)item.price;
+                        string giaTienttFormatted = giatien.ToString("#,##0") + " VND";
+                    }
+
+                    <a href="@Url.Action("Details", "Products", new { id = item.product_id })">
+                        <img src="@path" alt="Product Image" />
+                    </a>
+
+                    <a href="@Url.Action("Details", "Products", new { id = item.product_id })" class="product-name-link">
+                        @name
+                    </a>
+
+                    <p class="price" style="color: orange;"><b>@giaTienttFormatted</b></p>
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+@*<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>*@
+<script>
+    function changeMainImage(imageUrl) {
+        var mainImage = document.getElementById('mainImage');
+        mainImage.src = imageUrl;
+    }
+    function changeWishImage(imageUrl) {
+        var wishimg = document.getElementById('wishimg');
+        wishimg.src = imageUrl;
+    }
+
+    document.querySelector('input[name="quantity"]').addEventListener('input', function() {
+        var quantity = this.value;
+        var link = document.querySelector('a.order');
+        var url = '@Url.Action("Purchase", "Carts", new { id = Model.product_id, quantity = "__quantity__" })';
+        url = url.replace("__quantity__", quantity);
+        link.href = url;
+    });
+</script>

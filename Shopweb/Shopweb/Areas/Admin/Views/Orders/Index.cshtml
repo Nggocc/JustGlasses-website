@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Shopweb.Models.Order>
+@using Shopweb.Models
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@{ 
+    var db = new DBContext();
+    var sum = db.Orders.Count();
+
+}
+<h2>Đơn hàng <span style="background-color: black; border-radius: 50px; width: 60px; color: white">@sum</span></h2>
+
+<table class="table">
+    <tr>
+        <th>
+            Người đặt
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Shipment.address)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.date)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.status)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Payment.Customer.name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Shipment.address)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.date)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.status)
+        </td>
+        <td>
+            @Html.ActionLink("Cập nhập trạng thái", "Edit", new { id=item.order_id }) |
+            @Html.ActionLink("Chi tiết", "Details", new { id=item.order_id }) |
+           
+    </tr>
+}
+
+</table>

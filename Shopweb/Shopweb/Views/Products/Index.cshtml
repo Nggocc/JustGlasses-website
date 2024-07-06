@@ -1,0 +1,159 @@
+﻿@model IEnumerable<Shopweb.Models.Product>
+@using Shopweb.Models
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    DBContext db = new DBContext();
+}
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<style>
+
+    .slide > h5 {
+        color: darkblue;
+    }
+
+    .slide p {
+        color: orange;
+    }
+
+    .product-card {
+        border: 1px solid lightgrey;
+        text-align: center;
+        width: 270px;
+        padding: 10px; /* Padding inside the card */
+        box-sizing: border-box; /* Ensure padding is included in the width and height */
+    }
+
+        .product-card img {
+            width: 100%;
+            height: 270px;
+            margin-bottom: 10px; /* Space between image and next element */
+        }
+
+        .product-card a {
+            text-align: center;
+            display: block;
+            margin-bottom: 10px; /* Space between links and other elements */
+            color: inherit; /* Keep link color consistent */
+            text-decoration: none; /* Remove underline from links */
+        }
+
+        .product-card p {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+</style>
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#myCarousel" data-slide-to="1"></li>
+        <li data-target="#myCarousel" data-slide-to="2"></li>
+    </ol>
+
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="~/Content/Images/slideshow/sl1.png" class="d-block w-100" alt="First Slide">
+        </div>
+        <div class="carousel-item">
+            <img src="~/Content/Images/slideshow/sl2.png" class="d-block w-100" alt="Second Slide">
+        </div>
+        <div class="carousel-item">
+            <img src="~/Content/Images/slideshow/sl3.png" class="d-block w-100" alt="Third Slide">
+        </div>
+    </div>
+
+    <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev" style="color: orange">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </a>
+    <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next" style="color: orange">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </a>
+</div>
+<h2 style="text-align: center; margin-top: 30px; margin-bottom: 20px; font-weight: 600; letter-spacing: 2px">NEW ARRIVAL - SALE OFF 20%</h2>
+@{
+    var topSellingProducts = db.Order_Details
+            .GroupBy(od => od.product_id)
+            .Select(g => new
+            {
+                ProductId = g.Key,
+                SalesQuantity = g.Sum(od => od.quantity)
+            })
+            .OrderByDescending(g => g.SalesQuantity)
+            .Take(8)
+            .ToList();
+
+    // Retrieve the products corresponding to the top-selling product IDs
+    List<Product> products = new List<Product>();
+    foreach (var item in topSellingProducts)
+    {
+        var p = Model.Where(o => o.product_id == item.ProductId).SingleOrDefault();
+        products.Add(p);
+    }
+    var arrivalProducts = Model.Where(m => m.InventoryDate?.Month == DateTime.Now.Month).Take(8).ToList();
+
+}
+<div class="container">
+    <div class="row">
+        @foreach (var item in arrivalProducts)
+        {
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex justify-content-start">
+                <div class="product-card">
+                    @{
+                        string path = Url.Content("~/Content/Images/" + item.image);
+                        string name = item.name?.ToUpper();
+                        decimal giatien = (decimal)item.price;
+                        string giaTienFormatted = giatien.ToString("#,##0") + " VND";
+                    }
+
+                    <a href="@Url.Action("Details", "Products", new { id = item.product_id })">
+                        <img src="@path" alt="Product Image" />
+                    </a>
+
+                    <a href="@Url.Action("Details", "Products", new { id = item.product_id })" class="product-name-link">
+                        @name
+                    </a>
+
+                    <p class="price" style="color: orange;"><b>@giaTienFormatted</b></p>
+                </div>
+            </div>
+
+        }
+    </div>
+</div>
+<h2 style="text-align: center; margin-top: 30px; margin-bottom: 20px; font-weight: 600; letter-spacing: 2px">BÁN CHẠY NHẤT - HOT PRODUCTS</h2>
+
+<div class="container">
+    <div class="row">
+        @foreach (var item in products)
+        {
+
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex justify-content-start">
+                <div class="product-card">
+                    @{
+                        string path = Url.Content("~/Content/Images/" + item.image);
+                        string name = item.name?.ToUpper();
+                        decimal giatien = (decimal)item.price;
+                        string giaTienFormatted = giatien.ToString("#,##0") + " VND";
+                    }
+
+                    <a href="@Url.Action("Details", "Products", new { id = item.product_id })">
+                        <img src="@path" alt="Product Image" />
+                    </a>
+
+                    <a href="@Url.Action("Details", "Products", new { id = item.product_id })" class="product-name-link">
+                        @name
+                    </a>
+
+                    <p class="price" style="color: orange;"><b>@giaTienFormatted</b></p>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+<div class="d-flex justify-content-center">
+    <img src="~/Content/Images/bg1.png" style="border-radius: 15px; width: 530px; margin-right: 15px" />
+    <img src="~/Content/Images/bg2.png" style="border-radius: 15px; width: 530px;" />
+</div>

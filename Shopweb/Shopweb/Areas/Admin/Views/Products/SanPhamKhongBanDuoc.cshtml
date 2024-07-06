@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Shopweb.Models.TopBanChay>
+
+@{
+    ViewBag.Title = "SanPhamKhongBanDuoc";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Top 5 sản phẩm không bán được</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mã Sản Phẩm</th>
+            <th>Tên Sản Phẩm</th>
+            <th>Giá</th>
+            <th>Tổng Số Lượng Bán</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.ProductId</td>
+                <td>@product.ProductName</td>
+                <td>@product.Price.ToString("##,##") VND</td>
+                <td>@product.TotalQuantity</td>
+            </tr>
+        }
+    </tbody>
+</table>
